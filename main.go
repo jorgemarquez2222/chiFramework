@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	canales "github.com/jorgemarquez2222/chiFramework/canales"
 )
 
 type Post struct {
@@ -57,13 +58,20 @@ func PostArticle(w http.ResponseWriter, r *http.Request) {
 	respJson(w, http.StatusOK, post)
 }
 
+func signalChannel(w http.ResponseWriter, r *http.Request) {
+	canales.MetodoSignal()
+	var mapa = map[string]string{"nombre": "Jeannelis"}
+	mapa["hola"] = "algo"
+	respJson(w, http.StatusOK, mapa)
+}
+
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Get("/articles/{slug}-{slug2}", getArticle)
 	r.Get("/channel", testChannel)
 	r.Get("/channelUnidireccional", channelUnidireccional)
-	r.Get("/metodoSignal", metodoSignal)
+	r.Get("/metodoSignal", signalChannel)
 	r.Post("/", PostArticle)
 	http.ListenAndServe(":3000", r)
 }

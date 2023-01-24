@@ -3,14 +3,19 @@ package canales
 import "fmt"
 
 func MetodoSignal() {
-	ch := make(chan string, 2) // un canal de 2 buffer
+	ch := make(chan string, 2)    // un canal de 2 buffer
+	signal := make(chan struct{}) // un canal de 2 buffer
 	go func() {
-		fmt.Print(<-ch)
+		fmt.Println(<-ch)
+		fmt.Println(<-ch)
+		fmt.Println(<-ch)
+		signal <- struct{}{}
 	}()
-	send(ch)
+	send(ch, signal)
+	<-signal
 }
 
-func send(ch chan string) {
+func send(ch chan string, signal chan<- struct{}) {
 	ch <- "a"
 	ch <- "b"
 	ch <- "c"
