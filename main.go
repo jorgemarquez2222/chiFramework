@@ -63,6 +63,7 @@ func main() {
 	r.Get("/articles/{slug}-{slug2}", getArticle)
 	r.Get("/channel", testChannel)
 	r.Get("/channelUnidireccional", channelUnidireccional)
+	r.Get("/metodoSignal", metodoSignal)
 	r.Post("/", PostArticle)
 	http.ListenAndServe(":3000", r)
 }
