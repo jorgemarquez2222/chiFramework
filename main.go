@@ -4,10 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	canales "github.com/jorgemarquez2222/chiFramework/canales"
+	fact "github.com/jorgemarquez2222/chiFramework/fact"
+	products "github.com/jorgemarquez2222/chiFramework/products"
+	services "github.com/jorgemarquez2222/chiFramework/services"
 )
 
 type Post struct {
@@ -65,6 +69,36 @@ func signalChannel(w http.ResponseWriter, r *http.Request) {
 	respJson(w, http.StatusOK, mapa)
 }
 
+func reuqestTest(w http.ResponseWriter, r *http.Request) {
+	url := "http://159.65.241.58:3000/products"
+	resp := services.Fetch(url)
+	var product products.Produt
+	err := json.Unmarshal(resp, &product)
+	if err != nil {
+		fmt.Println("Error_11:", err)
+	}
+	product.AddAllQauntity(20)
+	fmt.Println(len(product.Products))
+	product.RemoveProduct(924)
+	product.RemoveProduct(933)
+	fmt.Println(len(product.Products))
+	product.AddElement(1)
+	fmt.Println(len(product.Products))
+	respJson(w, http.StatusOK, product)
+}
+
+func testFact(w http.ResponseWriter, r *http.Request) {
+	var wg sync.WaitGroup
+	var wg2 sync.WaitGroup
+
+	go fact.Fact(1, &wg)
+	go fact.Fact(2, &wg2)
+
+	wg.Wait()
+	wg2.Wait()
+
+}
+
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -73,5 +107,7 @@ func main() {
 	r.Get("/channelUnidireccional", channelUnidireccional)
 	r.Get("/metodoSignal", signalChannel)
 	r.Post("/", PostArticle)
+	r.Get("/reuqestTest", reuqestTest)
+	r.Get("/fact", testFact)
 	http.ListenAndServe(":3000", r)
 }
