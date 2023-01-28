@@ -87,16 +87,17 @@ func reuqestTest(w http.ResponseWriter, r *http.Request) {
 	respJson(w, http.StatusOK, product)
 }
 
-func testFact(w http.ResponseWriter, r *http.Request) {
+func testFactMultiplexado(w http.ResponseWriter, r *http.Request) {
 	var wg sync.WaitGroup
-	var wg2 sync.WaitGroup
 
-	go fact.Fact(1, &wg)
-	go fact.Fact(2, &wg2)
-
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func(j int) {
+			fact.Fact(j)
+			wg.Done()
+		}(i)
+	}
 	wg.Wait()
-	wg2.Wait()
-
 }
 
 func main() {
@@ -108,6 +109,6 @@ func main() {
 	r.Get("/metodoSignal", signalChannel)
 	r.Post("/", PostArticle)
 	r.Get("/reuqestTest", reuqestTest)
-	r.Get("/fact", testFact)
+	r.Get("/fact", testFactMultiplexado)
 	http.ListenAndServe(":3000", r)
 }
